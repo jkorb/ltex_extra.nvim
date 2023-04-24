@@ -40,6 +40,67 @@ local function extend_ltex_on_attach(on_attach)
     end
 end
 
+local ltex_languages = {
+    "auto",
+    "ar",
+    "ast-ES",
+    "be-BY",
+    "br-FR",
+    "ca-ES",
+    "ca-ES-valencia",
+    "da-DK",
+    "de",
+    "de-AT",
+    "de-CH",
+    "de-DE",
+    "de-DE-x-simple-language",
+    "el-GR",
+    "en",
+    "en-AU",
+    "en-CA",
+    "en-GB",
+    "en-NZ",
+    "en-US",
+    "en-ZA",
+    "eo",
+    "es",
+    "es-AR",
+    "fa",
+    "fr",
+    "ga-IE",
+    "gl-ES",
+    "it",
+    "ja-JP",
+    "km-KH",
+    "nl",
+    "nl-BE",
+    "pl-PL",
+    "pt",
+    "pt-AO",
+    "pt-BR",
+    "pt-MZ",
+    "pt-PT",
+    "ro-RO",
+    "ru-RU",
+    "sk-SK",
+    "sl-SI",
+    "sv",
+    "ta-IN",
+    "tl-PH",
+    "uk-UA",
+    "zh-CN",
+}
+
+local register_user_cmds = function()
+    vim.api.nvim_create_user_command("LtexSwitchLang", function()
+        vim.ui.select(ltex_languages, {
+            prompt = "Select language:",
+        }, function(choice)
+            require("ltex_extra.commands-lsp").switchLanguage(choice)
+        end)
+    end, { desc = "ltex_extra.nvim: Switch sever language" })
+end
+
 M.reload = function(...)
     require("ltex_extra.commands-lsp").reload(...)
 end
@@ -48,6 +109,7 @@ M.setup = function(opts)
     M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})
     M.opts.path = vim.fs.normalize(M.opts.path) .. "/"
 
+    register_user_cmds()
     register_lsp_commands()
 
     if M.opts.server_opts and M.opts.server_start then

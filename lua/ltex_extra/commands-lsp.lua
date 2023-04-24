@@ -145,4 +145,4 @@ function M.switchLanguage(lang)
     end
 end
 
-return Meturn M
+return M
