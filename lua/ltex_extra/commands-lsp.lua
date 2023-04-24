@@ -7,6 +7,7 @@ local types = {
     ["dict"] = "dictionary",
     ["dRules"] = "disabledRules",
     ["hRules"] = "hiddenFalsePositives",
+    ["language"] = "language",
 }
 
 local function get_settings(client)
@@ -45,6 +46,14 @@ local function update_hiddenFalsePositive(client, lang)
     return client.notify("workspace/didChangeConfiguration", settings)
 end
 
+local function update_language(client, lang)
+    log.trace("update_language")
+    local settings = get_settings(client)
+    settings.ltex.language = lang
+    log.debug(vim.inspect(settings.ltex.language))
+    return client.notify("workspace/didChangeConfiguration", settings)
+end
+
 local M = {}
 
 function M.catch_ltex()
@@ -66,12 +75,14 @@ function M.updateConfig(configtype, lang)
             update_disabledRules(client, lang)
         elseif configtype == types.hRules then
             update_hiddenFalsePositive(client, lang)
+        elseif configtype == types.language then
+            update_language(client, lang)
         else
             log.fmt_error("Config type unknown")
             return vim.notify("Config type unknown")
         end
     else
-        return error("Error catching ltex client",1)
+        return error("Error catching ltex client", 1)
     end
 end
 
@@ -124,4 +135,14 @@ function M.hideFalsePositives(command)
     end
 end
 
-return M
+function M.switchLanguage(lang)
+    log.trace("language")
+    local client = M.catch_ltex()
+    if client then
+        M.updateConfig(types.language, lang)
+    else
+        return error("Error catching ltex client", 1)
+    end
+end
+
+return Meturn M
